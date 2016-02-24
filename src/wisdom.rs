@@ -41,6 +41,11 @@ macro_rules! wisdom {
     ($p: expr) => { let _guard = fftw3::wisdom::WisdomGuard::import($p); }
 }
 
+fn native_file_name(p: &Path) -> *const u8 {
+    p.as_os_str().to_str()
+        .expect("fftw3: Path expected to be valid unicode")
+        .as_ptr()
+}
 
 /// Attempt to load the system's wisdom.
 pub fn import_from_system() -> bool {
@@ -51,16 +56,16 @@ pub fn import_from_system() -> bool {
 
 /// Attempt to save wisdom to `p`.
 pub fn export_to_file(p: &Path) -> bool {
-    let v = p.as_os_str().to_cstring().unwrap();
+    let v = native_file_name(p);
     unsafe {
-        lock::run(|| ffi::fftw_export_wisdom_to_filename(v.as_ptr() as *const i8) != 0)
+        lock::run(|| ffi::fftw_export_wisdom_to_filename(v as *const i8) != 0)
     }
 }
 
 /// Attempt to load wisdom from `p`.
 pub fn import_from_file(p: &Path) -> bool {
-    let v = p.as_os_str().to_cstring().unwrap();
+    let v = native_file_name(p);
     unsafe {
-        lock::run(|| ffi::fftw_import_wisdom_from_filename(v.as_ptr() as *const i8) != 0)
+        lock::run(|| ffi::fftw_import_wisdom_from_filename(v as *const i8) != 0)
     }
 }
