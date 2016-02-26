@@ -1,5 +1,8 @@
 #![crate_type="lib"]
 
+//! This crate provides a high level interface to the FFTW3 library
+#![warn(missing_docs)]
+
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
